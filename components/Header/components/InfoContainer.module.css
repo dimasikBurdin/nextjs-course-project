@@ -1,0 +1,26 @@
+.main {
+    display: flex;
+    gap: 4px;
+    color: #006666;
+    align-items: center;
+}
+
+.icon {
+    width: 32px;
+    height: 32px;
+}
+
+.answersIcon {
+    background: url('icons/add.svg');
+    background-size: 100% 100%;
+}
+
+.timeIcon {
+    background: url('icons/time.svg');
+    background-size: 100% 100%;
+}
+
+.answersContainer {
+    display: flex;
+    align-items: center;
+}

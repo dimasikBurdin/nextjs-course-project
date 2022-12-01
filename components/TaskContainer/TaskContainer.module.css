@@ -1,0 +1,20 @@
+.main {
+    width: 824px;
+    display: flex;
+    flex-direction: column;
+    gap: 60px;
+    align-items: center;
+}
+
+.answers {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+}
+
+.buttons {
+    align-self: flex-end;
+    display: flex;
+    gap: 48px;
+    margin-top: 40px;
+}
