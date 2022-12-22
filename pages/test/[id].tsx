@@ -1,5 +1,6 @@
+import { ObjectId } from 'mongodb';
 import { useRouter } from 'next/router';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { CountdownCircleTimer } from 'react-countdown-circle-timer';
 import { Header } from '../../components/Header/Header';
 import { SideMenu } from '../../components/SideMenu/SideMenu';
@@ -18,17 +19,41 @@ export default function DinamicPage(props: {testData?: Test}) {
     router.push(`/test/${taskNumber}`);
     setTestData(undefined);
   }
-  const goToNextTask = () => {
+  const goToNextTask = async () => {
     if(+router.query.id!.toString() + 1 > testData!.questions.length) {
-      alert('Тест пройден!');
-      router.push('/');
+      const checkRes = await fetch('http://localhost:3000/api/getAnswers');
+      const { questions } = await checkRes.json() as {questions: Array<{valid: number}>};
+      const resultsRes = await fetch('http://localhost:3000/api/getResults');
+      const sendedAnswers = await resultsRes.json() as Array<{ questNumber: number, resNumber: number}>;
+      const totalAns = questions.length;
+      let currentAns = 0;
+      for(let {questNumber, resNumber} of sendedAnswers) {
+        if(questions[questNumber].valid === resNumber) {
+          currentAns++;
+        }
+      }
+      // alert(`Тест пройден! \n Ваши баллы ${currentAns}/${totalAns}`);
+      // router.push('/');
+      router.push('/resultPage/resultPage');
     } else {
       router.push(`/test/${+router.query.id!.toString() + 1}`)
       setTestData(undefined);
     }    
   }
 
-  useEffect(() => {
+  const onClickSubmitAnswer = async (testId: ObjectId, questNumber: number, resNumber: number) => {
+    const res = await fetch('http://localhost:3000/api/sendResult', {
+      method: "POST",
+      body: JSON.stringify({
+        testId,
+        questNumber,
+        resNumber,
+      })
+    });
+    goToNextTask();
+  }
+
+  useMemo(() => {
     const getTestData = async () => {
       setIsLoading(true)
       const response = await fetch('http://localhost:3000/api/hello');
@@ -51,8 +76,9 @@ export default function DinamicPage(props: {testData?: Test}) {
     return `${minutes}:${seconds}`
   }
 
-  const { timeLimit, questions, title } = testData
-  const {options, timeLimit: currentAnswerTime, title: currentAnswerTitle} =questions[+(router.query.id as string) - 1];
+  const { timeLimit, questions, title, _id} = testData;
+  const { options, timeLimit: currentAnswerTime, title: currentAnswerTitle } = questions[+(router.query.id as string) - 1];
+ 
 
   return (
     <div className={styles.main}>
@@ -86,7 +112,7 @@ export default function DinamicPage(props: {testData?: Test}) {
             answers={options}
             title={currentAnswerTitle}
             onClickSkip={() => {}}
-            onClickSubmit={goToNextTask}
+            onClickSubmit={(activeNumber) => onClickSubmitAnswer(_id, +(router.query.id as string) - 1, activeNumber)}
           />
         </div>
       </div>

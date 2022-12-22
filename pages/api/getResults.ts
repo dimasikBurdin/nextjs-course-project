@@ -6,18 +6,11 @@ import { test } from '../../test-moks/test/test';
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const url = "mongodb://localhost:27017/";
   const client = new MongoClient(url);
-  // setTimeout(() => {
-  //   res.send(JSON.stringify([test]))
-  // }, 300)
   try {
     await client.connect();
-    const nameDB = (await client.db().admin().listDatabases()).databases[3].name;
-    const anyData = await client.db(nameDB).collection("tests").find({}).limit(1).toArray();
-    console.log(anyData)
-    setTimeout(() => {
-      res.send(JSON.stringify(anyData))
-      res.send('')
-    }, 10);
+    const nameDB =  (await client.db().admin().listDatabases()).databases[3].name;
+    const results = await client.db(nameDB).collection(`results 6374bc1d78879ba5724e1393`).find({}).toArray();
+    res.send(JSON.stringify(results));
   } catch(e) {
     console.log(e)
   } finally {

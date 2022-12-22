@@ -11,13 +11,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   // }, 300)
   try {
     await client.connect();
-    const nameDB = (await client.db().admin().listDatabases()).databases[3].name;
-    const anyData = await client.db(nameDB).collection("tests").find({}).limit(1).toArray();
-    console.log(anyData)
-    setTimeout(() => {
-      res.send(JSON.stringify(anyData))
-      res.send('')
-    }, 10);
+    const nameDB =  (await client.db().admin().listDatabases()).databases[3].name;
+    await client.db(nameDB).collection(`results ${JSON.parse(req.body).testId}`).insertOne( JSON.parse(req.body));
+    res.send('')
   } catch(e) {
     console.log(e)
   } finally {

@@ -2,27 +2,27 @@ import React, { useState } from "react";
 import type { FC } from "react";
 import styles from './TaskContainer.module.css';
 import { Button } from "../Button/Button";
+import type { Option } from "../../types/answer";
 import { RadioButton } from "../RadioButton/RadioButton";
 
 type Props = {
     title: string;
-    answers: Array<{
-        title: string;
-        valid: boolean;
-    }>;
+    answers: Array<Option>;
     onClickSkip: () => void;
-    onClickSubmit: () => void;
+    onClickSubmit: (answerNumber: number) => void;
 }
 
 export const TaskContainer: FC<Props> = ({ answers, onClickSkip, onClickSubmit, title }) => {
     const [activeRadioButton, setActiveRadioButton] = useState(-1);
 
     const submitTask = () => {
-        if(answers[activeRadioButton].valid) {
-            onClickSubmit();
-        } else {
-            alert("Неверный ответ")
-        }
+        onClickSubmit(activeRadioButton);
+        // if(answers[activeRadioButton].valid) {
+        //     onClickSubmit();
+        // } else {
+        //     alert("Неверный ответ")
+        //      onClickSubmit();
+        // }
     }
 
     const onClick = (activeNumber: number) => {
@@ -31,9 +31,9 @@ export const TaskContainer: FC<Props> = ({ answers, onClickSkip, onClickSubmit, 
     return <div className={styles.main}>
        <div className={styles.title}>{title}</div>
        <div className={styles.answers}>
-            {answers?.map(({ title, valid }, index) => {
+            {answers?.map(({ title }, index) => {
                 return <RadioButton 
-                    key={title + valid + index} 
+                    key={title + index} 
                     title={title} 
                     type="radio" 
                     isActive={index === activeRadioButton}

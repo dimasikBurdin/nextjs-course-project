@@ -1,4 +1,4 @@
 export type Option = {
     title: string;
-    valid: boolean;
+    // valid: boolean;
 }
